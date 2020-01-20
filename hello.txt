@@ -1,0 +1,313 @@
+#https://github.com/TwoWater/Python
+
+#文件路径
+import os
+os.chdir("D:/machinelearning")
+os.getcwd()
+pwd
+
+#生成随机数据
+np.random.seed(42)
+df=pd.DataFrame(np.random.randint(0,100,size=(10,4)),columns=["x{}".format(i) for i in range(4)])
+df
+#导出数据
+df.to_csv('temp.csv')
+
+#导入数据
+d=pd.read_csv('temp.csv')
+
+#导入网上数据
+url = "https://storage.googleapis.com/qeds/data/wdi_data.csv"
+df = pd.read_csv(url)
+df
+
+#重新设定观察值索引号
+df=df.set_index('year')    #以year为索引变量
+df=df.reset_index()           #去掉索引变量，改为自动编号
+df=df.set_index(['year','country'])  #重新设定
+
+#修改变量名
+df.columns   #显示列名
+df=df.rename(columns={'GovExpend':'G','Consumption':'C'})
+
+#提取变量
+df['GDP']
+df[['GDP','C','G']]
+
+df.loc[2:4]
+df=df.set_index(['year','country'])  #重新设定
+df.loc[2:4]   #将报错
+df.iloc[2:4]
+
+df.loc[2015,'Canada']
+
+df.loc[(2015,'Canada'),'C']
+df.loc[pd.IndexSlice[[2007,2009],['Canada','Germany']],['G','C']]
+
+#对已有变量计算生成新变量
+df['Inv']=df.eval('GDP-G-C')
+df.diff()     #差分变换
+df.pct_change()   #百分比变换
+
+#转置
+df.T
+
+#数据透视表
+pd.pivot_table(df,index='country',columns='year',values='G')
+pd.pivot_table(df,index='country',columns='year',values='G',aggfunc=[max,min,np.mean,np.median])
+
+#统计
+df.corr()
+df.max()
+df.mean()
+df.sum()
+df.std()
+df.var()
+df.var(axis=1)
+
+#标准化
+def s(x):
+    return (x-x.mean())/x.std()
+df.apply(s)
+df.apply(lambda x:(x-x.mean())/x.std())
+
+#数据清理
+df = pd.DataFrame({"numbers": ["#23", "#24", "#18", "#14", "#12", "#10", "#35"],
+                   "nums": ["23", "24", "18", "14", np.nan, "XYZ", "35"],
+                   "colors": ["green", "red", "yellow", "orange", "purple", "blue", "pink"],
+                   "other_column": [0, 1, 0, 2, 1, 0, 2]})
+df
+df['numbers']=df["numbers"].str.replace("#", "")   #删除特殊字符
+df
+
+#变量类型转换
+df.dtypes
+df['numbers']=df['numbers'].astype(float)
+df.dtypes
+
+
+#缺失值处理
+df.isnull()  
+df.dropna()
+df.fillna(value=0)
+df.fillna(method='bfill')
+df.fillna(method='ffill')
+
+#数据重整
+# made up
+# columns A and B are "identifiers" while C, D, and E are variables.
+df = pd.DataFrame({
+    "A": [0, 0, 1, 1],
+    "B": "x y x z".split(),
+    "C": [1, 2, 1, 4],
+    "D": [10, 20, 30, 20,],
+    "E": [2, 1, 5, 4,]
+})
+
+df.info()
+df
+df.T
+df2 = df.set_index(["A", "B"])
+df2
+df2_stack = df2.stack()
+df2_stack
+df2.unstack()
+df
+df_melted = df.melt(id_vars=["A", "B"])
+df_melted
+df_melted.pivot_table(index="A",columns="B",values='value')
+
+
+#数据合并
+
+dfL = pd.DataFrame(
+    {"Key": ["A", "B", "A", "C"], "C1":[1, 2, 3, 4], "C2": [10, 20, 30, 40]},
+    index=["L1", "L2", "L3", "L4"]
+)
+dfL
+
+dfR = pd.DataFrame(
+    {"Key": ["A", "B", "C", "D"], "C3": [100, 200, 300, 400]},
+    index=["R1", "R2", "R3", "R4"]
+)
+dfR
+
+pd.concat([dfL, dfR])
+pd.concat([dfL, dfR], axis=1)
+pd.merge(dfL, dfR, on="Key")
+pd.merge(dfL, dfR, on="Key", how="right")
+
+#分类统计
+C = np.arange(1, 7, dtype=float)
+C[[3, 5]] = np.nan
+df = pd.DataFrame({
+    "A" : [1, 1, 1, 2, 2, 2],
+    "B" : [1, 1, 2, 2, 1, 1],
+    "C": C,
+})
+df
+
+gbA = df.groupby("A")
+gbA.get_group(1)
+gbA.get_group(2)
+gbAB = df.groupby(["A", "B"])
+gbAB.get_group((1, 1))
+
+#正则表达式
+https://www.runoob.com/python/python-reg-expressions.html
+
+
+
+#打开网页
+import webbrowser
+webbrowser.open("http://www.baidu.com")
+
+#打印2020年的日历
+import calendar as ca
+print(ca.month(2020,1))
+print(ca.calendar(2020))
+
+
+requests库
+
+用于在程序中进行http协议下的get和post请求的模块，并且被网友说成“好用的要哭”。
+
+import requests
+r = requests.get("http://www.itdiffer.com")
+r.headers
+print(r.text)
+
+
+
+#迭代九九乘法表
+print('\n'.join([' '.join ('%8dx%d=%d' % (x,y,x*y)  for x in range(1,y+1)) for y in range(1,10)]))
+
+
+# 生成器
+
+#函数是顺序执行，遇到 return 语句或者最后一行函数语句就返回。
+#而变成 generator 的函数，在每次调用 next() 的时候执行，遇到 yield语句返回，再次执行时从上次返回的 yield 语句处继续执行。
+
+
+
+print([x * x for x in range(10)])
+print(gen)
+#注意列表是[]，而生成器是（）
+gen= (x * x for x in range(10))
+for num  in  gen :
+	print(num)
+
+# 杨辉三角形
+def triangles( n ):        
+    L = [1]
+    while True:
+        yield L
+        L.append(0)
+        L = [ L [ i -1 ] + L [ i ] for i in range (len(L))]
+
+n= 0
+for t in triangles( 10 ):   # 直接修改函数名即可运行
+    print(t)
+    n = n + 1
+    if n == 10:
+        break
+
+#计算斐波那契数列的生成器
+def fibon(n):
+    a = b = 1
+    for i in range(n):
+        yield a
+        a, b = b, a + b
+
+# 引用函数
+for x in fibon(10):
+    print(x,end=" ")
+
+
+#同时迭代多个序列
+names = ['laingdianshui', 'twowater', '两点水']
+ages = [18, 19, 20]
+for name, age in zip(names, ages):
+     print(name,age)
+
+#用 zip() 函数，我们还可把一个 key 列表和一个 value 列表生成一个 dict （字典）,如下：
+
+# -*- coding: UTF-8 -*-
+
+names = ['laingdianshui', 'twowater', '两点水']
+ages = [18, 19, 20]
+
+dict1= dict(zip(names,ages))
+
+print(dict1)
+
+
+###############################################
+##正则表达式
+
+import re
+a = 'uav,ubv,ucv,uwv,uzv,ucv,uov'
+
+# 字符集
+
+# 取 u 和 v 中间是 a 或 b 或 c 的字符
+findall = re.findall('u[abc]v', a)
+print(findall)
+# 如果是连续的字母，数字可以使用 - 来代替
+l = re.findall('u[a-c]v', a)
+print(l)
+
+# 取 u 和 v 中间不是 a 或 b 或 c 的字符
+re_findall = re.findall('u[^abc]v', a)
+print(re_findall)
+
+
+import re
+
+a = 'uav_ubv_ucv_uwv_uzv_ucv_uov&123-456-789'
+
+# 概括字符集
+
+# \d 相当于 [0-9] ,匹配所有数字字符
+# \D 相当于 [^0-9] ， 匹配所有非数字字符
+findall1 = re.findall('\d', a)
+findall2 = re.findall('[0-9]', a)
+findall3 = re.findall('\D', a)
+findall4 = re.findall('[^0-9]', a)
+print(findall1)
+print(findall2)
+print(findall3)
+print(findall4)
+
+# \w 匹配包括下划线的任何单词字符，等价于 [A-Za-z0-9_]
+findall5 = re.findall('\w', a)
+findall6 = re.findall('[A-Za-z0-9_]', a)
+print(findall5)
+print(findall6)
+
+
+#Pandas
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+import re
+
+cname=[f'JBDM{i}' for i in range(1,16)] 
+jbdm=pd.read_csv("D:/data/yb/syby.csv",usecols=cname)
+jbdm=jbdm.astype(str)
+jbdm=jbdm.applymap(lambda x:x[0:5])
+jbdm=jbdm.applymap(lambda x:re.sub("\.",'X',x))
+bb=jbdm["JBDM1"]+" "+jbdm["JBDM2"]+" "+jbdm["JBDM3"]+" "+jbdm["JBDM4"]+" "+jbdm["JBDM5"]+" "+jbdm["JBDM6"]+" "+jbdm["JBDM7"]+" "+jbdm["JBDM8"]+" "+jbdm["JBDM9"]+" "+jbdm["JBDM10"]+" "+jbdm["JBDM11"]+" "+jbdm["JBDM12"]+" "+jbdm["JBDM13"]+" "+jbdm["JBDM14"]+" "+jbdm["JBDM15"]
+
+cv=CountVectorizer()
+ccb=cv.fit_transform(bb)
+X=pd.DataFrame(ccb.toarray())
+wd=dict((v,k) for k,v in cv.vocabulary_.items())
+X=X.rename(columns=wd)
+X
+
+y=pd.read_csv("D:/data/yb/syby.csv",usecols=["ZFY"])
+
+
+
+yjbdm=pd.read_csv("D:/data/yb/syby.csv",usecols=["JBDM"])
+
